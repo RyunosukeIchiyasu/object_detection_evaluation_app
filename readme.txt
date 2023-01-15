@@ -1,1 +1,1 @@
-Tool to evaluate infer result of object detection
+Tool to evaluate infer result of object detection.
