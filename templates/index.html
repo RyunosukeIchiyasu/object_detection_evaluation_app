@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Object Detection Evaluater</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="container-fluid bg-dark text-white">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="file-upload">
+                    <p class="fs-3"><u>File Upload</u></p>
+                    <form action="/upload">
+                        <p>GT:<input class="form-control form-control-sm" type="text" name="gt" value="C:/work/infer/data/"></p>
+                        <p>Infer:<input class="form-control form-control-sm" type="text" name="infer" value="C:/work/infer/out/infer_results.csv"></p>
+                        <p>Label:<input class="form-control form-control-sm" type="text" name="label" value="person,car"></p>
+                        <p>Test List:<input class="form-control form-control-sm" type="text" name="testlist" value="C:/work/infer/data/test.txt"></p>
+                        <p><input class="btn btn-primary" type="submit" value="upload" formmethod="GET"></p>
+                    </form>
+                </div>
+
+                <div class="eval-setting">
+                    <p class="fs-3"><u>Label/IoU TH</u>​</p>
+                    <form action="/result">
+                        {% for classname in class_list %}
+                            <p><input class="form-check-input" type="checkbox" name="check" value={{classname}}>{{classname}}:<input type="range" name="iou" class="form-range" min="0" max="1" step="0.1"></p>
+                        {% endfor %}
+
+                        <p class="fs-3"><u>Score Increment For PR Curve</u>​​</p>
+                        <p><input type="range" name="princ" class="form-range" min="0" max="0.1" step="0.01" value="0.01"></p>
+                        <p><input class="btn btn-primary" type="submit" value="evaluate" formmethod="GET"></p>
+                    </form>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="performace-table">
+                    <p class="fs-3"><u>Best Performance</u>​​</p>
+                    <table class="table table-dark table-striped">
+                        <tr>
+                            <th>Class</th>
+                            <th>Best Score</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1</th>
+                            <th>TP_infer</th>
+                            <th>TP_gt</th>
+                            <th>FP</th>
+                            <th>FN</th>
+                        </tr>
+                        {% for result in eval_result_list %}
+                        <tr>
+                            <td>{{result.classname}}</td>
+                            <td>{{result.best_score}}</td>
+                            {% for index in result.eval_result %}
+                                {% if index.score == result.best_score %}
+                                    <td>{{index.precision}}</td>
+                                    <td>{{index.recall}}</td>
+                                    <td>{{index.f1}}</td>
+                                    <td>{{index.TP_infer}} obj</td>
+                                    <td>{{index.TP_gt}} obj</td>
+                                    <td>{{index.infers - index.TP_infer}} obj</td>
+                                    <td>{{index.gts - index.TP_gt}} obj</td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                        <!-- <tr>
+                            <td>ALL</td>
+                            <td>-</td>
+                            <td>72.5%</td>
+                            <td>77.5%</td>
+                            <td>74.9%</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>-</td>
+                        </tr> -->
+                    </table>
+                </div>
+
+                <div class="pr-curve">
+                    <p class="fs-3"><u>PR Curve</u>​​</p>
+                    <canvas id="pr-chart"></canvas>
+                    <script type="text/javascript">
+                        const ctx = document.getElementById('pr-chart');
+                        const myChart = new Chart(ctx, {
+                            type: 'scatter',
+                            data: {
+                                datasets: [],
+                            },
+                            options: {
+                                scales: {
+                                    x: {min: 0, max: 1, title:{display: true, text:'Recall'}},
+                                    y: {min: 0, max: 1, title:{display: true, text:'Precision'}}
+                                }
+                            }
+                        });
+
+                        const colorchart = ["lime", "aqua", "yellow", "red", "blue", "fuchsia"];
+                        for (const [i, result] of Object.entries({{eval_result_list|tojson}})) {
+                            var label = result.classname;
+                            var data = [];
+                            var color = colorchart[i%6]
+                            for (const index of result.eval_result) {
+                                dot = {x: index.recall, y: index.precision};
+                                data.push(dot);
+                            }
+                            myChart.data.datasets.push({label: label,
+                                                        data: data,
+                                                        pointBackgroundColor: color,
+                                                        borderColor: color,
+                                                        showLine: true,});
+                            myChart.update();
+                        }
+                    </script>
+                </div>
+
+                <div class="eval-result">
+                
+                    <p class="fs-3"><u>Eval Result</u>​​</p>
+                    {% for result in eval_result_list %}
+                    <table class="table table-dark table-striped">
+                        <h3>{{result.classname}}: best score is {{result.best_score}}</h3>
+                        <tr>
+                        <th>Score</th>
+                        <th>infers</th>
+                        <th>Gts</th>
+                        <th>TP_infer</th>
+                        <th>TP_gt</th>
+                        <th>precision</th>
+                        <th>recall</th>
+                        <th>f1</th>
+                        </tr>
+                        {% for index in result.eval_result %}
+                        <tr>
+                            <td>{{index.score}}</td>
+                            <td>{{index.infers}}</td>
+                            <td>{{index.gts}}</td>
+                            <td>{{index.TP_infer}}</td>
+                            <td>{{index.TP_gt}}</td>
+                            <td>{{index.precision}}</td>
+                            <td>{{index.recall}}</td>
+                            <td>{{index.f1}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div> 
+  </body>
+</html>
