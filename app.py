@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, request
+from flask import render_template, request, redirect
 from evaluation import Evaluator
 import numpy as np
 import pprint
@@ -19,11 +19,12 @@ PATH_TO_TEST_LIST = None
 def index():
     global eval_result_list, class_list, PATH_TO_ANNOTATION_DIR, PATH_TO_INFER_RESULT, PATH_TO_TEST_LIST
 
-    eval_result_list = []
-    class_list = []
-    PATH_TO_ANNOTATION_DIR = None
-    PATH_TO_INFER_RESULT = None
-    PATH_TO_TEST_LIST = None
+    # eval_result_list = []
+    # class_list = []
+    # PATH_TO_ANNOTATION_DIR = None
+    # PATH_TO_INFER_RESULT = None
+    # PATH_TO_TEST_LIST = None
+
     return render_template('index.html', eval_result_list=eval_result_list, class_list=class_list)
 
 @app.route('/upload', methods=["GET"])
@@ -37,7 +38,9 @@ def upload():
     PATH_TO_TEST_LIST = request.args.get("testlist")
     class_list = request.args.get("label").split(',')
 
-    return render_template('index.html', eval_result_list=eval_result_list, class_list=class_list)
+    return redirect('/')
+
+    # return render_template('index.html', eval_result_list=eval_result_list, class_list=class_list)
 
 @app.route('/result', methods=["GET"])
 def result():
@@ -65,7 +68,9 @@ def result():
         dic['best_score'] = best_score
         eval_result_list.append(dic)
 
-    return render_template('index.html', eval_result_list=eval_result_list, class_list=class_list)
+    return redirect('/')
+
+    # return render_template('index.html', eval_result_list=eval_result_list, class_list=class_list)
 
 if __name__ == "__main__":
     app.run(debug=True)
