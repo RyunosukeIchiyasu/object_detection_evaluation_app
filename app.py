@@ -6,7 +6,7 @@ import numpy as np
 import pprint
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///PathData.db'
+app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///Data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO']=True
 
@@ -32,6 +32,10 @@ class ClassTable(db.Model):
 @app.before_first_request
 def init():
     db.create_all()
+
+    path = PathTable(PATH_TO_ANNOTATION_DIR = "default", PATH_TO_INFER_RESULT = "default", PATH_TO_TEST_LIST = "default")
+    db.session.add(path)
+    db.session.commit()
 
 @app.route('/')
 def initialize():
@@ -68,6 +72,8 @@ def upload():
     data.PATH_TO_ANNOTATION_DIR = path_to_annnotation_dir
     data.PATH_TO_INFER_RESULT = path_to_infer_result
     data.PATH_TO_TEST_LIST = path_to_test_list
+    db.session.commit()
+
 
     db.session.query(ClassTable).delete()
     for classname in class_list:
