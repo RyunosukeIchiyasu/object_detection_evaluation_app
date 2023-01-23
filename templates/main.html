@@ -24,12 +24,16 @@
                 <div class="eval-setting">
                     <p class="fs-3"><u>Label/IoU TH</u>​</p>
                     <form action="/result">
-                        {% for classname in class_list %}
-                            <p><input class="form-check-input" type="checkbox" name="check" value={{classname}}>{{classname}}:<input type="range" name="iou" class="form-range" min="0" max="1" step="0.1"></p>
+                        {% for classrow in class_list %}
+                            {% if classrow.checked == True %}
+                                <p><input class="form-check-input" type="checkbox" name="check" value={{classrow.classname}} checked="checked">{{classrow.classname}}:<input type="range" name="iou" class="form-range" min="0" max="1" step="0.1" value={{classrow.iou}}></p>
+                            {% else %}
+                                <p><input class="form-check-input" type="checkbox" name="check" value={{classrow.classname}}>{{classrow.classname}}:<input type="range" name="iou" class="form-range" min="0" max="1" step="0.1" value={{classrow.iou}}></p>
+                            {% endif %}
                         {% endfor %}
 
                         <p class="fs-3"><u>Score Increment For PR Curve</u>​​</p>
-                        <p><input type="range" name="princ" class="form-range" min="0" max="0.1" step="0.01" value="0.01"></p>
+                        <p><input type="range" name="princ" class="form-range" min="0" max="0.1" step="0.01" value={{princ}}></p>
                         <p><input class="btn btn-primary" type="submit" value="evaluate" formmethod="GET"></p>
                     </form>
                 </div>

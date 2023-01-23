@@ -29,6 +29,11 @@ class ClassTable(db.Model):
     checked = db.Column(db.Boolean)
     iou = db.Column(db.Float)
 
+class PRTable(db.Model):
+    __tablename__ = 'PR'
+    id = db.Column(db.Integer, primary_key=True)
+    princ = db.Column(db.Float)
+
 @app.before_first_request
 def init():
     db.create_all()
@@ -37,11 +42,12 @@ def init():
     db.session.add(path)
     db.session.commit()
 
+    pr = PRTable(princ = 0.01)
+    db.session.add(pr)
+    db.session.commit()
+
 @app.route('/')
 def initialize():
-    global eval_result_list
-
-    eval_result_list = []
 
     return redirect('/main')
 
@@ -52,11 +58,16 @@ def reload():
     class_list = []
     data = db.session.query(ClassTable)
     for classrow in data:
-        class_list.append(classrow.classname)
-        print(classrow.checked)
-        print(classrow.iou)
+        dic={}
+        dic['classname'] = classrow.classname
+        dic['checked'] = classrow.checked
+        dic['iou'] = classrow.iou
+        class_list.append(dic)
+    
+    data = db.session.query(PRTable).first()
+    princ = data.princ
 
-    return render_template('main.html', eval_result_list=eval_result_list, class_list=class_list)
+    return render_template('main.html', eval_result_list=eval_result_list, class_list=class_list, princ=princ)
 
 @app.route('/upload', methods=["GET"])
 def upload():
@@ -113,6 +124,11 @@ def result():
             data.checked = False
             data.iou = float(ioulist[i])
         db.session.commit()
+
+    db.session.query(PRTable).delete()
+    pr = PRTable(princ = float(request.args.get("princ")))
+    db.session.add(pr)
+    db.session.commit()
 
     SCORE_INCRIMENT = float(request.args.get("princ"))
 
