@@ -17,9 +17,7 @@ class Evaluator:
     def readGT(self, PATH_TO_ANNOTATION_DIR, PATH_TO_TEST_LIST):
         with open(PATH_TO_TEST_LIST, "r") as f:
             lines = f.read().splitlines()
-        GT_PATHS = []
-        for line in lines:
-            GT_PATHS.append(PATH_TO_ANNOTATION_DIR + line.split('.')[0] + '.xml')
+        GT_PATHS = [PATH_TO_ANNOTATION_DIR + line.split('.')[0] + '.xml' for line in lines]
         
         for index, gt_path in enumerate(GT_PATHS):
             root = ET.parse(gt_path).getroot()
@@ -36,7 +34,6 @@ class Evaluator:
                                 if bbox.tag=='ymin': gt['top'] = bbox.text
                                 if bbox.tag=='ymax': gt['bottom'] = bbox.text
                     self.gtlist.append(gt)
-        # pprint.pprint(self.gtlist)
 
     def iou(self, a, b):
         # input shape : a, b =[xmin, ymin, xmax, ymax]
@@ -73,30 +70,19 @@ class Evaluator:
                         gt_bbox = [int(gt['left']), int(gt['top']), int(gt['right']), int(gt['bottom'])]
                         iou = self.iou(infer_bbox, gt_bbox)
                         if iou > IOU_TH and infer['class']==gt['class']:
-                            candidate = {}
-                            candidate['gt'] = gt
-                            candidate['iou'] = iou
-                            candidates.append(candidate)
+                            candidates.append({'gt':gt, 'iou':iou})
                 # choose one gt to pair with infer
-                pair = {}
-                pair['infer'] = infer
                 if len(candidates) == 0:
-                    pair['gt'] = 'none'
-                    pair['iou'] = 'none'
-                    pairlist_infer.append(pair)
+                    pairlist_infer.append({'infer':infer, 'gt':'none', 'iou':'none'})
                 elif len(candidates) == 1:
-                    pair['gt'] = candidates[0]['gt']
-                    pair['iou'] = candidates[0]['iou']
-                    pairlist_infer.append(pair)
+                    pairlist_infer.append({'infer':infer, 'gt':candidates[0]['gt'], 'iou':candidates[0]['iou']})
                 elif len(candidates) >= 2:
                     maxiou = 0
                     for index, candidate in enumerate(candidates):
                         if candidate['iou'] > maxiou:
                             maxindex = index
                             maxiou = candidate['iou']
-                    pair['gt'] = candidates[maxindex]['gt']
-                    pair['iou'] = candidates[maxindex]['iou']
-                    pairlist_infer.append(pair)
+                    pairlist_infer.append({'infer':infer, 'gt':candidates[maxindex]['gt'], 'iou':candidates[maxindex]['iou']})
         
         return(pairlist_infer)
 
@@ -119,31 +105,20 @@ class Evaluator:
                             infer_bbox = [int(infer['left']), int(infer['top']), int(infer['right']), int(infer['bottom'])]
                             iou = self.iou(gt_bbox, infer_bbox)
                             if iou > IOU_TH and gt['class']==infer['class']:
-                                candidate = {}
-                                candidate['infer'] = infer
-                                candidate['iou'] = iou
-                                candidates.append(candidate)
+                                candidates.append({'infer':infer, 'iou':iou})
 
                 # choose one infer to pair with gt
-                pair = {}
-                pair['gt'] = gt
                 if len(candidates) == 0:
-                    pair['infer'] = 'none'
-                    pair['iou'] = 'none'
-                    pairlist_GT.append(pair)
+                    pairlist_GT.append({'gt':gt, 'infer':'none', 'iou':'none'})
                 elif len(candidates) == 1:
-                    pair['infer'] = candidates[0]['infer']
-                    pair['iou'] = candidates[0]['iou']
-                    pairlist_GT.append(pair)
+                    pairlist_GT.append({'gt':gt, 'infer':candidates[0]['infer'], 'iou':candidates[0]['iou']})
                 elif len(candidates) >= 2:
                     maxiou = 0
                     for index, candidate in enumerate(candidates):
                         if candidate['iou'] > maxiou:
                             maxindex = index
                             maxiou = candidate['iou']
-                    pair['infer'] = candidates[maxindex]['infer']
-                    pair['iou'] = candidates[maxindex]['iou']
-                    pairlist_GT.append(pair)
+                    pairlist_GT.append({'gt':gt, 'infer':candidates[maxindex]['infer'], 'iou':candidates[maxindex]['iou']})
 
         return(pairlist_GT)
 
@@ -172,7 +147,7 @@ class Evaluator:
             result['TP_infer'], result['TP_gt'] = self.ConfusionMatrix(pairlist_infer, pairlist_GT)
             result['precision'] = round(result['TP_infer']/result['infers'], 3) if result['infers']!=0 else 0.00
             result['recall'] = round(result['TP_gt']/result['gts'], 3) if result['gts']!=0 else 0.00
-            f1 = round(2*result['precision']*result['recall']/(result['precision']+result['recall']), 3) if result['infers']!=0 and result['gts']!=0 else 0.00
+            f1 = round(2*result['precision']*result['recall']/(result['precision']+result['recall']), 3) if result['precision']!=0 and result['recall']!=0 else 0.00
             if f1 > best_f1:
                 best_f1 = f1
                 best_score = round(SCORE_TH, 2)

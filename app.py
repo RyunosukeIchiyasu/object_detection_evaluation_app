@@ -2,13 +2,11 @@ from flask import Flask
 from flask import render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from evaluation import Evaluator
-import numpy as np
-import pprint
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///Data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO']=True
+app.config['SQLALCHEMY_ECHO']=False
 
 db = SQLAlchemy(app)
 
@@ -55,14 +53,8 @@ def initialize():
 def reload():
     global eval_result_list
 
-    class_list = []
     data = db.session.query(ClassTable)
-    for classrow in data:
-        dic={}
-        dic['classname'] = classrow.classname
-        dic['checked'] = classrow.checked
-        dic['iou'] = classrow.iou
-        class_list.append(dic)
+    class_list=[{'classname': classrow.classname, 'checked': classrow.checked, 'iou': classrow.iou} for classrow in data]
     
     data = db.session.query(PRTable).first()
     princ = data.princ
@@ -85,7 +77,6 @@ def upload():
     data.PATH_TO_TEST_LIST = path_to_test_list
     db.session.commit()
 
-
     db.session.query(ClassTable).delete()
     for classname in class_list:
         classrow = ClassTable(classname=classname, checked=True, iou=0.5)
@@ -104,10 +95,8 @@ def result():
     PATH_TO_INFER_RESULT = data.PATH_TO_INFER_RESULT
     PATH_TO_TEST_LIST = data.PATH_TO_TEST_LIST
 
-    class_list = []
     data = db.session.query(ClassTable)
-    for classrow in data:
-        class_list.append(classrow.classname)
+    class_list = [classrow.classname for classrow in data]
 
     checklist = request.args.getlist("check")
     ioulist = request.args.getlist("iou")
@@ -118,16 +107,14 @@ def result():
         if classname in checklist:
             data.checked = True
             data.iou = float(ioulist[i])
-            dic = {'classname':classname, 'iou_th':float(ioulist[i])}
-            EVAL_TARGET_LIST.append(dic)
+            EVAL_TARGET_LIST.append({'classname':classname, 'iou_th':float(ioulist[i])})
         else:
             data.checked = False
             data.iou = float(ioulist[i])
         db.session.commit()
 
-    db.session.query(PRTable).delete()
-    pr = PRTable(princ = float(request.args.get("princ")))
-    db.session.add(pr)
+    data = db.session.query(PRTable).first()
+    data.princ = float(request.args.get("princ"))
     db.session.commit()
 
     SCORE_INCRIMENT = float(request.args.get("princ"))
@@ -138,12 +125,8 @@ def result():
 
     eval_result_list = []
     for eval_target in EVAL_TARGET_LIST:
-        dic = {}
         eval_result, best_score = evaluator.evaluate(eval_target['classname'], eval_target['iou_th'], SCORE_INCRIMENT)
-        dic['classname'] = eval_target['classname']
-        dic['eval_result'] = eval_result
-        dic['best_score'] = best_score
-        eval_result_list.append(dic)
+        eval_result_list.append({'classname':eval_target['classname'], 'eval_result':eval_result, 'best_score':best_score})
 
     return redirect('/main')
 
