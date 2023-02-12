@@ -26,14 +26,40 @@
                     <form action="/result">
                         {% for classrow in class_list %}
                             {% if classrow.checked == True %}
-                                <p><input class="form-check-input" type="checkbox" name="check" value={{classrow.classname}} checked="checked">{{classrow.classname}}:<input type="range" name="iou" class="form-range" min="0" max="1" step="0.1" value={{classrow.iou}}></p>
+                                <p><input class="form-check-input" type="checkbox" name="check" value={{classrow.classname}} checked="checked"><span id="{{classrow.classname}}">{{classrow.classname}} : {{classrow.iou}}</span></p>
                             {% else %}
-                                <p><input class="form-check-input" type="checkbox" name="check" value={{classrow.classname}}>{{classrow.classname}}:<input type="range" name="iou" class="form-range" min="0" max="1" step="0.1" value={{classrow.iou}}></p>
+                                <p><input class="form-check-input" type="checkbox" name="check" value={{classrow.classname}}><span id="{{classrow.classname}}">{{classrow.classname}} : {{classrow.iou}}</span></p>
                             {% endif %}
+                            <input type="range" name="iou"  id={{classrow.classname}} class="form-range" min="0" max="1" step="0.1" value={{classrow.iou}}>
                         {% endfor %}
+                        <script type="text/javascript">
+                            var listener = [];
+                            for (const [i, classrow] of Object.entries({{class_list|tojson}})) {
+                                classname = classrow.classname;
+                                var iou_range = document.querySelector("input[type='range'][id='"+CSS.escape(classname)+"']");
+                                function updateValue(classname, iou_range) {
+                                    return function() {
+                                        document.querySelector("span[id='"+CSS.escape(classname)+"']").innerHTML = classname+" : "+iou_range.value;
+                                    };
+                                }
+                                iou_range.addEventListener("input", updateValue(classname, iou_range));
+                                listener.push(iou_range);
+                            }
+                        </script>
 
                         <p class="fs-3"><u>Score Increment For PR Curve</u>​​</p>
-                        <p><input type="range" name="princ" class="form-range" min="0" max="0.1" step="0.01" value={{princ}}></p>
+                        <p><span id="princ">Increment : {{princ}}</span></p>
+                        <p><input type="range" name="princ" id="princ" class="form-range" min="0" max="0.1" step="0.01" value={{princ}}></p>
+                        <script type="text/javascript">
+                            var princ_range = document.querySelector("input[type='range'][id='princ']");
+                            function updateValue(classname, princ_range) {
+                                return function() {
+                                    document.querySelector("span[id='princ']").innerHTML = "Increment : "+princ_range.value;
+                                };
+                            }
+                            princ_range.addEventListener("input", updateValue(classname, princ_range));
+                        </script>
+                        
                         <p><input class="btn btn-primary" type="submit" value="evaluate" formmethod="GET"></p>
                     </form>
                 </div>
