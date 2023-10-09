@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <h1 class="fs-4">Best Performance</h1>
-    <table class="table table-dark table-striped">
+  <v-row class="flex-column pa-2">
+    <h3>Best Performance</h3>
+    <v-table fixed-header height="250px" class="bg-grey-darken-2 text-white">
       <thead>
         <tr>
           <th>Class</th>
@@ -28,51 +28,57 @@
           <td>{{ findEvalResultByScore(result, result.best_score).gts - findEvalResultByScore(result, result.best_score).TP_gt }} obj</td>
         </tr>
       </tbody>
-    </table>
-
-    <h1 class="fs-4">PR Curve</h1>
-    <div style="width:500px;height:500px;"><canvas id="pr-chart"></canvas></div>
-
-    <h1 class="fs-4">Eval Result</h1>
-    <div v-for="result in eval_result_list" :key="result.classname">
-      <h3>{{ result.class_name }}: best score is {{ result.best_score }}</h3>
-      <table class="table table-dark table-striped">
-        <thead>
-          <tr>
-            <th>Score</th>
-            <th>infers</th>
-            <th>Gts</th>
-            <th>TP_infer</th>
-            <th>TP_gt</th>
-            <th>precision</th>
-            <th>recall</th>
-            <th>f1</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="index in result.eval_result" :key="index.score">
-            <td>{{ index.score }}</td>
-            <td>{{ index.infers }}</td>
-            <td>{{ index.gts }}</td>
-            <td>{{ index.TP_infer }}</td>
-            <td>{{ index.TP_gt }}</td>
-            <td>{{ index.precision }}</td>
-            <td>{{ index.recall }}</td>
-            <td>{{ index.f1 }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-  </div>
-</template>
+    </v-table>
+  </v-row>
+  
+  <v-row class="pa-2">
+    <v-col lg="6" class="flex-column">
+      <h3>PR Curve</h3>
+      <div style="width:500px;height:500px;"><canvas id="pr-chart"></canvas></div>
+    </v-col>
+    
+    <v-col lg="6" class="flex-column">
+      <h3>Detail</h3>
+      <div v-for="result in eval_result_list" :key="result.classname" class="pa-2">
+        <h5>{{ result.class_name }}: best score is {{ result.best_score }}</h5>
+        <v-table fixed-header height="200px" class="bg-grey-darken-2 text-white">
+          <thead>
+            <tr>
+              <th>Score</th>
+              <th>infers</th>
+              <th>Gts</th>
+              <th>TP_infer</th>
+              <th>TP_gt</th>
+              <th>precision</th>
+              <th>recall</th>
+              <th>f1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="index in result.eval_result" :key="index.score">
+              <td>{{ index.score }}</td>
+              <td>{{ index.infers }}</td>
+              <td>{{ index.gts }}</td>
+              <td>{{ index.TP_infer }}</td>
+              <td>{{ index.TP_gt }}</td>
+              <td>{{ index.precision }}</td>
+              <td>{{ index.recall }}</td>
+              <td>{{ index.f1 }}</td>
+            </tr>
+          </tbody>
+        </v-table>
+      </div>
+    </v-col>
+  </v-row>
+    
+  </template>
 
 <script>
 import Chart from 'chart.js/auto';
 
 export default {
   name: 'EvalResult',
-
+  
   props: ['eval_result_list'],
 
   data() {

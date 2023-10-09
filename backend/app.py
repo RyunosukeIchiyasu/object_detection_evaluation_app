@@ -111,6 +111,7 @@ def addInfer():
     reader = csv.DictReader(infer_file_contents)
     infered_objs = [row for row in reader]
     for obj in infered_objs:
+        print(obj)
         new_obj = InferObject(infer=new_infer,
                               file_name=obj['filename'],
                               class_name=obj['class'],

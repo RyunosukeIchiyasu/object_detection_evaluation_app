@@ -1,21 +1,29 @@
 <template>
-  <div class="container-fluid bg-dark text-white">
-    <div class="row">
-      <div class="col-sm-2">
-        <FileUpload @clicked-Upload="clickedUpload"></FileUpload>
-      </div>
-      <div class="col-sm-3">
-        <EvalSetting ref="evalsetting_component" :gt_id="gt_id" :infer_id="infer_id" :class_iou_list="class_iou_list" @clicked-evaluate="initEvaluateResult" @clicked-apply="applyEvaluateResult"></EvalSetting>
-      </div>
-      <div class="col-sm-7">
-        <EvalResult ref="evalresult_component" :eval_result_list="eval_result_list"></EvalResult>
-      </div>
-    </div>
-  </div>
+  <v-app>
+    <v-app-bar app class="bg-blue-grey-darken-4 text-white">
+      <v-img :max-width="64" :max-height="64" src="./assets/logo.png"></v-img>
+      <v-app-bar-title><h1>Object Detection Evaluator</h1></v-app-bar-title>
+    </v-app-bar>
+
+    <v-main class="container-fluid bg-grey-darken-4 text-white">
+      <v-container>
+        <v-row>
+          <v-col lg="3">
+            <EvalSetting ref="evalsetting_component" :gt_id="gt_id" :infer_id="infer_id" :class_iou_list="class_iou_list" @clicked-evaluate="initEvaluateResult" @clicked-apply="applyEvaluateResult"></EvalSetting>
+          </v-col>
+          <v-col lg="9">
+            <EvalResult ref="evalresult_component" :eval_result_list="eval_result_list"></EvalResult>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+
+    <v-footer app class="bg-teal-lighten-4 text-dark">Object Detection Evaluator</v-footer>
+
+  </v-app>
 </template>
 
 <script>
-import FileUpload from './components/FileUpload.vue'
 import EvalSetting from './components/EvalSetting.vue'
 import EvalResult from './components/EvalResult.vue'
 import axios from 'axios';
@@ -23,7 +31,7 @@ import axios from 'axios';
 export default {
   name: 'App',
   components: {
-    FileUpload, EvalSetting, EvalResult
+    EvalSetting, EvalResult
   },
   data() {
     return {
