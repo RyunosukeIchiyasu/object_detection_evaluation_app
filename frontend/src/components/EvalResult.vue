@@ -22,7 +22,7 @@
           <td>{{ findEvalResultByScore(result, result.best_score).precision }}</td>
           <td>{{ findEvalResultByScore(result, result.best_score).recall }}</td>
           <td>{{ findEvalResultByScore(result, result.best_score).f1 }}</td>
-          <td>{{ findEvalResultByScore(result, result.best_score).TP_infer }} obj</td>
+          <td @click="DownloadImageList()">{{ findEvalResultByScore(result, result.best_score).TP_infer }} obj</td>
           <td>{{ findEvalResultByScore(result, result.best_score).TP_gt }} obj</td>
           <td>{{ findEvalResultByScore(result, result.best_score).infers - findEvalResultByScore(result, result.best_score).TP_infer }} obj</td>
           <td>{{ findEvalResultByScore(result, result.best_score).gts - findEvalResultByScore(result, result.best_score).TP_gt }} obj</td>
@@ -34,7 +34,7 @@
   <v-row class="pa-2">
     <v-col lg="6" class="flex-column">
       <h3>PR Curve</h3>
-      <div style="width:500px;height:500px;"><canvas id="pr-chart"></canvas></div>
+      <div style="width:550px;height:550px;"><canvas id="pr-chart"></canvas></div>
     </v-col>
     
     <v-col lg="6" class="flex-column">
@@ -99,6 +99,10 @@ export default {
     findEvalResultByScore(result, score) {
       return result.eval_result.find((result) => result.score === score);
     },
+    DownloadImageList(){
+      console.log("clicked")
+    },
+
     drawChart(new_eval_result_list){
       if(Object.keys(this.myChart).length > 0){
         this.myChart.destroy();
@@ -133,5 +137,4 @@ export default {
   mounted(){
   },
 }
-
 </script>

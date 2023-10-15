@@ -18,7 +18,7 @@
       </v-container>
     </v-main>
 
-    <v-footer app class="bg-teal-lighten-4 text-dark">Object Detection Evaluator</v-footer>
+    <v-footer app class="bg-blue-grey-darken-4 text-white">Object Detection Evaluator</v-footer>
 
   </v-app>
 </template>
