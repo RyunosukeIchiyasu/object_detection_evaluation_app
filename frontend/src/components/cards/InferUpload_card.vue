@@ -1,7 +1,7 @@
 <template>
 	<v-dialog v-model="dialog" persistent width="500">
 		<template v-slot:activator="{ props }">
-			<v-icon icon="mdi mdi-upload" v-bind="props"></v-icon>
+			<v-icon icon="mdi-upload" v-bind="props" color="#0D6EFD"></v-icon>
 		</template>
 		<v-card>
 			<v-card-title>
@@ -15,10 +15,10 @@
 			</v-card-text>
 			<v-card-actions>
 				<v-spacer></v-spacer>
-				<v-btn color="blue-darken-1" variant="text" @click="dialog = false">
+				<v-btn color="#69a195" variant="text" @click="dialog = false">
 					Close
 				</v-btn>
-				<v-btn color="blue-darken-1" variant="text" @click="addInfer(); dialog = false">
+				<v-btn color="#69a195" variant="text" @click="addInfer(); dialog = false">
 					Upload
 				</v-btn>
 			</v-card-actions>

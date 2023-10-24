@@ -1,0 +1,26 @@
+<annotation>
+	<folder>image</folder>
+	<filename>35.jpg</filename>
+	<path>C:\Users\Ryu\Documents\10_tech\10_object_detection\infer\data\image\35.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1920</width>
+		<height>1080</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>person</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1276</xmin>
+			<ymin>620</ymin>
+			<xmax>1346</xmax>
+			<ymax>697</ymax>
+		</bndbox>
+	</object>
+</annotation>

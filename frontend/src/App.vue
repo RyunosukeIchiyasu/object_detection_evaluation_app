@@ -1,24 +1,27 @@
 <template>
   <v-app>
-    <v-app-bar app class="bg-blue-grey-darken-4 text-white">
-      <v-img :max-width="64" :max-height="64" src="./assets/logo.png"></v-img>
-      <v-app-bar-title><h1>Object Detection Evaluator</h1></v-app-bar-title>
+    <v-app-bar style="background-color: #6991a1; color: #FFFFFF;">
+      <v-img :max-width="55" :max-height="55" src="./assets/logo_od.png" style="margin-left: 20px;"></v-img>
+      <v-app-bar-title><h2>Object Detection Evaluator</h2></v-app-bar-title>
+      <v-img :max-width="114" :max-height="64" src="./assets/logo_git.png" @click="openGitHub()" justify="end" style="margin-right: 20px;"></v-img>
     </v-app-bar>
 
-    <v-main class="container-fluid bg-grey-darken-4 text-white">
+    <v-main style="background-color: #504f5a; color: #FFFFFF;">
       <v-container>
         <v-row>
           <v-col lg="3">
             <EvalSetting ref="evalsetting_component" :gt_id="gt_id" :infer_id="infer_id" :class_iou_list="class_iou_list" @clicked-evaluate="initEvaluateResult" @clicked-apply="applyEvaluateResult"></EvalSetting>
           </v-col>
           <v-col lg="9">
-            <EvalResult ref="evalresult_component" :eval_result_list="eval_result_list"></EvalResult>
+            <EvalResult ref="evalresult_component" :eval_result_list="eval_result_list" :gt_id="gt_id" :infer_id="infer_id"></EvalResult>
           </v-col>
+        </v-row>
+
+        <v-row>
+          
         </v-row>
       </v-container>
     </v-main>
-
-    <v-footer app class="bg-blue-grey-darken-4 text-white">Object Detection Evaluator</v-footer>
 
   </v-app>
 </template>
@@ -43,12 +46,13 @@ export default {
   },
 
   methods: {
-    clickedUpload(){
-      this.$refs.evalsetting_component.getList();
+    openGitHub(){
+      window.open('https://github.com/RyunosukeIchiyasu', '_blank');
     },
     applyEvaluateResult(init){
       const class_iou_list_true = this.class_iou_list.filter(class_iou => class_iou.checked === true);
-      axios.get('http://localhost:5000/getEval', {
+      // axios.get('http://localhost:5000/getEval', {
+      axios.get('/getEval', {
         params: {
           gt_id: this.gt_id,
           infer_id: this.infer_id,
