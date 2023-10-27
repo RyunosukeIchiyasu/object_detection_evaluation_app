@@ -5,10 +5,11 @@ There are existing metrics used in various competitions, which can be complex fo
 
 Furthermore, I noticed the challenges engineers encounter when trying to improve model performance. The process of visually confirming objects in inferred images and adjusting numerous parameters for subsequent models can be time-consuming. This application streamlines these tasks with a user-friendly web interface and an intuitive analysis dashboard.
 
-<img src="./doc/dashboard.png">
+<img src="./doc/main.png">
 
 # Installation
-Write install process here.
+Click `create_venv.bat` to create a virtual environment, and use `run.bat` to start the local server.<br>
+Access http://127.0.0.1:5000 in your web browser.
 
 # Functions
 ## File upload
@@ -27,5 +28,5 @@ The scatter chart displays a PR (Precision-Recall) curve. The horizontal axis re
 ## Image viewer
 The image data is filtered based on the number of objects in the confusion matrix as shown in the table. In the images, you'll find annotation boxes (in green) and prediction boxes (in red). This allows you to visually assess which objects have been predicted correctly or not. This helps in understanding the characteristics of false predictions and determining the next steps to improve the model's performance.
 
-<img src="./doc/preview_image.png">
+<img src="./doc/preview.png">
 
