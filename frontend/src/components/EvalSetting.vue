@@ -129,7 +129,8 @@ export default {
 
   methods: {
     getList(){
-      axios.get('http://localhost:5000/getList')
+    //   axios.get('http://localhost:5000/getList')
+      axios.get('/getList')
       .then(response => {
         this.gt_list = response.data.gt_list;
         this.infer_list = response.data.infer_list;
@@ -137,7 +138,8 @@ export default {
       })
     },
     deleteList(value){
-      axios.get('http://localhost:5000/deleteList', {
+    //   axios.get('http://localhost:5000/deleteList', {
+      axios.get('/deleteList', {
         params: {
           delete_info: value,
         }
