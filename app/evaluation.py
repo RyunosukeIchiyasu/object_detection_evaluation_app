@@ -1,4 +1,6 @@
 import numpy as np
+import time
+from tqdm import tqdm
 
 class Evaluator:
     def __init__(self):
@@ -24,71 +26,67 @@ class Evaluator:
         iou = intersect / (a_area + b_area - intersect)
         return iou
 
-    def findPairInferToGT(self, SCORE_TH, IOU_TH, CLASS_LIST):
+    def findPairInferToGT(self, score_th, iou_th, class_name):
         # search for candidates
         # condition : iou is more than 0 and being detected the same class
         pairlist_infer = []
 
-        for infer in self.inferlist:
-            if float(infer['score']) < SCORE_TH or infer['class'] not in CLASS_LIST:
-                pass
-            else:
-                candidates = []
-                for gt in self.gtlist:
-                    if infer['filename'] == gt['filename']:
-                        infer_bbox = [int(infer['left']), int(infer['top']), int(infer['right']), int(infer['bottom'])]
-                        gt_bbox = [int(gt['left']), int(gt['top']), int(gt['right']), int(gt['bottom'])]
-                        iou = self.iou(infer_bbox, gt_bbox)
-                        if iou > IOU_TH and infer['class']==gt['class']:
-                            candidates.append({'gt':gt, 'iou':iou})
-                # choose one gt to pair with infer
-                if len(candidates) == 0:
-                    pairlist_infer.append({'infer':infer, 'gt':'none', 'iou':'none'})
-                elif len(candidates) == 1:
-                    pairlist_infer.append({'infer':infer, 'gt':candidates[0]['gt'], 'iou':candidates[0]['iou']})
-                elif len(candidates) >= 2:
-                    maxiou = 0
-                    for index, candidate in enumerate(candidates):
-                        if candidate['iou'] > maxiou:
-                            maxindex = index
-                            maxiou = candidate['iou']
-                    pairlist_infer.append({'infer':infer, 'gt':candidates[maxindex]['gt'], 'iou':candidates[maxindex]['iou']})
+        inferlist_filtered_by_classname_scoreth = [infer for infer in self.inferlist if infer['class'] == class_name and float(infer['score']) > score_th]
+        for infer in inferlist_filtered_by_classname_scoreth:
+            candidates = []
+            for gt in self.gtlist:
+                if infer['filename'] == gt['filename'] and infer['class']==gt['class']:
+                    infer_bbox = [infer['left'], infer['top'], infer['right'], infer['bottom']]
+                    gt_bbox = [gt['left'], gt['top'], gt['right'], gt['bottom']]
+                    iou = self.iou(infer_bbox, gt_bbox)
+                    if iou > iou_th:
+                        candidates.append({'gt':gt, 'iou':iou})
+            # choose one gt to pair with infer
+            if len(candidates) == 0:
+                pairlist_infer.append({'infer':infer, 'gt':'none', 'iou':'none'})
+            elif len(candidates) == 1:
+                pairlist_infer.append({'infer':infer, 'gt':candidates[0]['gt'], 'iou':candidates[0]['iou']})
+            elif len(candidates) >= 2:
+                maxiou = 0
+                for index, candidate in enumerate(candidates):
+                    if candidate['iou'] > maxiou:
+                        maxindex = index
+                        maxiou = candidate['iou']
+                pairlist_infer.append({'infer':infer, 'gt':candidates[maxindex]['gt'], 'iou':candidates[maxindex]['iou']})
         
         return(pairlist_infer)
 
-    def findPairGTToInfer(self, SCORE_TH, IOU_TH, CLASS_LIST):
+    def findPairGTToInfer(self, score_th, iou_th, class_name):
         # search for candidates
         # condition : iou is more than 0 and being detected the same class
         pairlist_GT = []
 
-        for gt in self.gtlist:
-            if gt['class'] not in CLASS_LIST:
-                pass
-            else:
-                candidates = []
-                for infer in self.inferlist:
-                    if float(infer['score']) < SCORE_TH:
-                        pass
-                    else:
-                        if gt['filename'] == infer['filename']:
-                            gt_bbox = [int(gt['left']), int(gt['top']), int(gt['right']), int(gt['bottom'])]
-                            infer_bbox = [int(infer['left']), int(infer['top']), int(infer['right']), int(infer['bottom'])]
-                            iou = self.iou(gt_bbox, infer_bbox)
-                            if iou > IOU_TH and gt['class']==infer['class']:
-                                candidates.append({'infer':infer, 'iou':iou})
+        gtlist_filtered_by_classname = [gt for gt in self.gtlist if gt['class'] == class_name]
+        for gt in gtlist_filtered_by_classname:
+            candidates = []
+            for infer in self.inferlist:
+                if float(infer['score']) < score_th:
+                    pass
+                else:
+                    if gt['filename'] == infer['filename'] and gt['class']==infer['class']:
+                        gt_bbox = [gt['left'], gt['top'], gt['right'], gt['bottom']]
+                        infer_bbox = [infer['left'], infer['top'], infer['right'], infer['bottom']]
+                        iou = self.iou(gt_bbox, infer_bbox)
+                        if iou > iou_th:
+                            candidates.append({'infer':infer, 'iou':iou})
 
-                # choose one infer to pair with gt
-                if len(candidates) == 0:
-                    pairlist_GT.append({'gt':gt, 'infer':'none', 'iou':'none'})
-                elif len(candidates) == 1:
-                    pairlist_GT.append({'gt':gt, 'infer':candidates[0]['infer'], 'iou':candidates[0]['iou']})
-                elif len(candidates) >= 2:
-                    maxiou = 0
-                    for index, candidate in enumerate(candidates):
-                        if candidate['iou'] > maxiou:
-                            maxindex = index
-                            maxiou = candidate['iou']
-                    pairlist_GT.append({'gt':gt, 'infer':candidates[maxindex]['infer'], 'iou':candidates[maxindex]['iou']})
+            # choose one infer to pair with gt
+            if len(candidates) == 0:
+                pairlist_GT.append({'gt':gt, 'infer':'none', 'iou':'none'})
+            elif len(candidates) == 1:
+                pairlist_GT.append({'gt':gt, 'infer':candidates[0]['infer'], 'iou':candidates[0]['iou']})
+            elif len(candidates) >= 2:
+                maxiou = 0
+                for index, candidate in enumerate(candidates):
+                    if candidate['iou'] > maxiou:
+                        maxindex = index
+                        maxiou = candidate['iou']
+                pairlist_GT.append({'gt':gt, 'infer':candidates[maxindex]['infer'], 'iou':candidates[maxindex]['iou']})
 
         return(pairlist_GT)
 
@@ -120,14 +118,16 @@ class Evaluator:
 
         return(TP_infer, TP_gt, FP, FN)
     
-    def evaluate(self, CLASS_LIST, IOU_TH, SCORE_INCRIMENT):
+    def evaluate(self, class_name, iou_th, SCORE_INCRIMENT):
         results = []
         best_score, best_f1 = 0, 0
-        for SCORE_TH in np.arange(0.00, 1.00, SCORE_INCRIMENT):
+        score_th_arr = np.arange(0.00, 1.00, SCORE_INCRIMENT)
+        score_th_list = score_th_arr.tolist()
+        for score_th in tqdm(score_th_list):
             result = {}
-            pairlist_infer = self.findPairInferToGT(SCORE_TH, IOU_TH, CLASS_LIST)
-            pairlist_GT = self.findPairGTToInfer(SCORE_TH, IOU_TH, CLASS_LIST)
-            result['score'] = round(SCORE_TH, 2)
+            pairlist_infer = self.findPairInferToGT(score_th, iou_th, class_name)
+            pairlist_GT = self.findPairGTToInfer(score_th, iou_th, class_name)
+            result['score'] = round(score_th, 2)
             result['infers'] = len(pairlist_infer)
             result['gts'] = len(pairlist_GT)
             result['TP_infer'], result['TP_gt'], result['FP'], result['FN'] = self.ConfusionMatrix(pairlist_infer, pairlist_GT)
@@ -136,7 +136,7 @@ class Evaluator:
             f1 = round(2*result['precision']*result['recall']/(result['precision']+result['recall']), 3) if result['precision']!=0 and result['recall']!=0 else 0.00
             if f1 > best_f1:
                 best_f1 = f1
-                best_score = round(SCORE_TH, 2)
+                best_score = round(score_th, 2)
             result['f1'] = f1
             results.append(result)
 

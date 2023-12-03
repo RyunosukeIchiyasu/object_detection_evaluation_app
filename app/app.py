@@ -118,7 +118,6 @@ def addInfer():
     reader = csv.DictReader(infer_file_contents)
     infered_objs = [row for row in reader]
     for obj in infered_objs:
-        print(obj)
         new_obj = InferObject(infer=new_infer,
                               file_name=obj['filename'],
                               class_name=obj['class'],
@@ -135,7 +134,6 @@ def addInfer():
 @app.route('/deleteList', methods=["GET"])
 def deleteList():
     table_name, delete_id = request.args.get("delete_info").split('_')
-    print(table_name, delete_id)
     if table_name == 'gt':
         db.session.query(GtObject).filter_by(gt_id=delete_id).delete()
         db.session.query(GtList).filter_by(gt_id=delete_id).delete()
@@ -172,7 +170,6 @@ def getEval():
                          'score': obj.score} for obj in data]
 
     if class_iou_list[0]['class_name']=='all':
-        print('all_mode')
         classes = list(set([obj['class'] for obj in evaluator.gtlist]))
         class_iou_list=[{'class_name':class_name, 'iou_th':0.5} for class_name in classes]
 
