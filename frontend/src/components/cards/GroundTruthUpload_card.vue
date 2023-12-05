@@ -47,7 +47,8 @@ export default {
       for (let i = 0; i < this.gt_files.length; i++) {
         formData.append('gt_files[]', this.gt_files[i]);
       }
-      axios.post('http://localhost:5000/addGt', formData, {
+      // axios.post('http://localhost:5000/addGt', formData, {
+      axios.post('/addGt', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

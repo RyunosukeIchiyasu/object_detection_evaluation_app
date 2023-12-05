@@ -45,7 +45,8 @@ export default {
       const formData = new FormData();
       formData.append('model_name', this.model_name);
       formData.append('infer_file', this.infer_file[0]);
-      axios.post('http://localhost:5000/addInfer', formData, {
+    //   axios.post('http://localhost:5000/addInfer', formData, {
+      axios.post('/addInfer', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
