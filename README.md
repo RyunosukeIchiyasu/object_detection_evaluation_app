@@ -9,7 +9,7 @@ Furthermore, I noticed the challenges engineers encounter when trying to improve
 
 # Installation
 Click `create_venv.bat` to create a virtual environment, and use `run.bat` to start the local server.<br>
-Access http://127.0.0.1:5000 in your web browser.
+Access http://127.0.0.1:80 in your web browser.
 
 # Functions
 ## File upload
