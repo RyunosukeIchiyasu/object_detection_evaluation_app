@@ -13,7 +13,7 @@ from object_detection.utils import visualization_utils
 
 app = Flask(__name__, static_folder='./static', template_folder='./templates')
 DATASETS_DIR = './datasets/GTA5'
-TEMP_IMAGE_PATH = 'C:/Users/Ryu/Documents/10_tech/10_object_detection/object_detection_evaluation_app/app/tmp/temp_image.jpg'
+TEMP_IMAGE_PATH = 'tmp/temp_image.jpg'
 
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///Data.db'
@@ -234,7 +234,7 @@ def getImage():
             min_score_thresh=0,
             agnostic_mode=False)
         
-    cv2.imwrite(TEMP_IMAGE_PATH, image_np_with_detections)
+    cv2.imwrite('app/tmp/temp_image.jpg', image_np_with_detections)
 
     return send_file(TEMP_IMAGE_PATH, mimetype='image/jpeg')
 
