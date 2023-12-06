@@ -7,13 +7,19 @@ import xml.etree.ElementTree as ET
 import csv
 import json
 
+import boto3
+
 import cv2
 import numpy as np
 from object_detection.utils import visualization_utils
 
 app = Flask(__name__, static_folder='./static', template_folder='./templates')
-DATASETS_DIR = './datasets/GTA5'
+# DATASETS_DIR = './datasets/GTA5'
 TEMP_IMAGE_PATH = 'tmp/temp_image.jpg'
+
+s3 = boto3.client('s3',
+                  aws_access_key_id='AKIAVFYKHZ4ZUANXC4TT',
+                  aws_secret_access_key='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')
 
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///Data.db'
@@ -183,7 +189,7 @@ def getEval():
 @app.route('/getImage', methods=["GET"])
 def getImage():
     filename = request.args.get("filename")
-    image_path = DATASETS_DIR + '/image/' + filename
+    # image_path = DATASETS_DIR + '/image/' + filename
     gt_id = request.args.get("gt_id")
     infer_id = request.args.get("infer_id")
     inspection_score = request.args.get("inspection_score")
@@ -200,7 +206,14 @@ def getImage():
         InferObject.score >= inspection_score,
         InferObject.class_name == inspection_class_name)
 
-    image_np = np.array(cv2.imread(image_path))
+    # local
+    # image_np = np.array(cv2.imread(image_path))
+
+    # AWS S3
+    response = s3.get_object(Bucket='ode-s3', Key='datasets/GTA5/image/'+filename)
+    image_data = response['Body'].read()
+    nparr = np.frombuffer(image_data, np.uint8)
+    image_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
     image_np_with_detections = image_np.copy()
     height = image_np.shape[0]
