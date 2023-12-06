@@ -7,9 +7,10 @@ Furthermore, I noticed the challenges engineers encounter when trying to improve
 
 <img src="./doc/main.png">
 
-# Installation
-Click `create_venv.bat` to create a virtual environment, and use `run.bat` to start the local server.<br>
-Access http://127.0.0.1:80 in your web browser.
+# APP demo website on AWS
+Access http://3.99.139.149 in your web browser.<br>
+** I recommend selecting dataset names that start with "\[5pics]" because this EC2 is a free, low-speed instance.<br>
+** The function of delete datasets is restricted in the demo.
 
 # Functions
 ## File upload
