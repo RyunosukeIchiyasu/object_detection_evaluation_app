@@ -18,8 +18,8 @@ app = Flask(__name__, static_folder='./static', template_folder='./templates')
 TEMP_IMAGE_PATH = 'tmp/temp_image.jpg'
 
 s3 = boto3.client('s3',
-                  aws_access_key_id='AKIAVFYKHZ4ZUANXC4TT',
-                  aws_secret_access_key='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')
+                  aws_access_key_id='XXXXXXXXXXXXXXXXXXX',
+                  aws_secret_access_key='XXXXXXXXXXXXXXXXXX')
 
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///Data.db'
