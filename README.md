@@ -8,7 +8,7 @@ Furthermore, I noticed the challenges engineers encounter when trying to improve
 <img src="./doc/main.png">
 
 # APP demo website on AWS
-Access http://3.99.139.149 in your web browser.<br>
+Access http://3.96.161.62/ in your web browser.<br>
 ** I recommend selecting dataset names that start with "\[5pics]" because this EC2 is a free, low-speed instance.<br>
 ** The function of delete datasets is restricted in the demo.
 
