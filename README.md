@@ -7,10 +7,18 @@ Furthermore, I noticed the challenges engineers encounter when trying to improve
 
 <img src="./doc/main.png">
 
-# APP demo website on AWS
-Access http://3.96.161.62/ in your web browser.<br>
-** I recommend selecting dataset names that start with "\[5pics]" because this EC2 is a free, low-speed instance.<br>
-** The function of delete datasets is restricted in the demo.
+# Local Installation
+Create a virtual environment.
+```
+create_venv.bat
+```
+Run the application and access it in your browser at http://127.0.0.1:80:
+```
+run.bat
+```
+Note:
+* Python 3.11.x is required. <br>
+* Try dataset names starting with "\[5pics]" as evaluating a large dataset may take longer depending on the environment.<br>
 
 # Functions
 ## File upload
@@ -30,4 +38,5 @@ The scatter chart displays a PR (Precision-Recall) curve. The horizontal axis re
 The image data is filtered based on the number of objects in the confusion matrix as shown in the table. In the images, you'll find annotation boxes (in green) and prediction boxes (in red). This allows you to visually assess which objects have been predicted correctly or not. This helps in understanding the characteristics of false predictions and determining the next steps to improve the model's performance.
 
 <img src="./doc/preview.png">
-
+<img src="./doc/person_example.png">
+<img src="./doc/car_example.png">

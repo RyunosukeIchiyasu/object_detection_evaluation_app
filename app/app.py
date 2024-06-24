@@ -14,12 +14,17 @@ import numpy as np
 from object_detection.utils import visualization_utils
 
 app = Flask(__name__, static_folder='./static', template_folder='./templates')
-# DATASETS_DIR = './datasets/GTA5'
-TEMP_IMAGE_PATH = 'tmp/temp_image.jpg'
+# local-----------------------------------------------
+DATASETS_DIR = './datasets/GTA5'
+# local-----------------------------------------------
 
-s3 = boto3.client('s3',
-                  aws_access_key_id='XXXXXXXXXXXXXXXXXXX',
-                  aws_secret_access_key='XXXXXXXXXXXXXXXXXX')
+# AWS S3-----------------------------------------------
+# s3 = boto3.client('s3',
+#                   aws_access_key_id='xxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+#                   aws_secret_access_key='xxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+# AWS S3-----------------------------------------------
+
+TEMP_IMAGE_PATH = 'tmp/temp_image.jpg'
 
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI']= 'sqlite:///Data.db'
@@ -189,7 +194,10 @@ def getEval():
 @app.route('/getImage', methods=["GET"])
 def getImage():
     filename = request.args.get("filename")
-    # image_path = DATASETS_DIR + '/image/' + filename
+    # local-----------------------------------------------
+    image_path = DATASETS_DIR + '/image/' + filename
+    # local-----------------------------------------------
+
     gt_id = request.args.get("gt_id")
     infer_id = request.args.get("infer_id")
     inspection_score = request.args.get("inspection_score")
@@ -206,14 +214,16 @@ def getImage():
         InferObject.score >= inspection_score,
         InferObject.class_name == inspection_class_name)
 
-    # local
-    # image_np = np.array(cv2.imread(image_path))
+    # local-----------------------------------------------
+    image_np = np.array(cv2.imread(image_path))
+    # local-----------------------------------------------
 
-    # AWS S3
-    response = s3.get_object(Bucket='ode-s3', Key='datasets/GTA5/image/'+filename)
-    image_data = response['Body'].read()
-    nparr = np.frombuffer(image_data, np.uint8)
-    image_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    # AWS S3-----------------------------------------------
+    # response = s3.get_object(Bucket='ode-s3', Key='datasets/GTA5/image/'+filename)
+    # image_data = response['Body'].read()
+    # nparr = np.frombuffer(image_data, np.uint8)
+    # image_np = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    # AWS S3-----------------------------------------------
 
     image_np_with_detections = image_np.copy()
     height = image_np.shape[0]
